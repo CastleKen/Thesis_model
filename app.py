@@ -1,3 +1,6 @@
+import base64
+from pathlib import Path
+
 import streamlit as st
 
 
@@ -46,6 +49,20 @@ footer {
     padding: 1.4rem 1.2rem;
     box-shadow: 0 10px 30px rgba(42, 26, 14, 0.12);
     animation: fadeUp 500ms ease;
+}
+
+.logo-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.logo-header img {
+    display: block;
+    height: 84px;
+    width: auto;
 }
 
 h1, h2, h3 {
@@ -197,6 +214,10 @@ div.stButton > button[data-testid="stBaseButton-secondary"]:focus-visible {
         padding: 1rem 0.8rem;
     }
 
+    .logo-header img {
+        height: 68px;
+    }
+
     .kpi-row {
         grid-template-columns: 1fr;
     }
@@ -218,6 +239,18 @@ if "answers" not in st.session_state:
 
 if "result" not in st.session_state:
     st.session_state.result = None
+
+if "psu_logo_b64" not in st.session_state:
+    psu_path = Path(__file__).resolve().parent / "logos" / "PSU Logo.png"
+    st.session_state.psu_logo_b64 = (
+        base64.b64encode(psu_path.read_bytes()).decode("utf-8") if psu_path.exists() else ""
+    )
+
+if "cs_logo_b64" not in st.session_state:
+    cs_path = Path(__file__).resolve().parent / "logos" / "CS Logo.png"
+    st.session_state.cs_logo_b64 = (
+        base64.b64encode(cs_path.read_bytes()).decode("utf-8") if cs_path.exists() else ""
+    )
 
 
 def build_recommendations(score: int, answers: dict) -> list[str]:
@@ -277,6 +310,19 @@ def show_how_it_works() -> None:
 
 with st.container():
 
+    st.markdown(
+        """
+<div class="logo-header">
+    <img src="data:image/png;base64,{psu_logo_b64}" alt="PSU Logo"/>
+    <img src="data:image/png;base64,{cs_logo_b64}" alt="CS Logo"/>
+</div>
+        """.format(
+            psu_logo_b64=st.session_state.get("psu_logo_b64", ""),
+            cs_logo_b64=st.session_state.get("cs_logo_b64", ""),
+        ),
+        unsafe_allow_html=True,
+    )
+
     if st.session_state.screen == "welcome":
         st.title("Digital Financial Literacy Assessment")
         st.write(
@@ -319,15 +365,9 @@ with st.container():
         st.header("Lets Identify Your Finacial Persona!")
         with st.form("questionnaire_form"):
             monthly_income = st.number_input("Monthly allowance or income (PHP)", min_value=0, value=15000, step=500)
-            savings_balance = st.number_input("Current savings balance (PHP)", min_value=0, value=8000, step=500)
-            debt_amount = st.number_input("Current debt amount (PHP)", min_value=0, value=4000, step=500)
-
+            
             budgeting_habit = st.slider("How consistent are you with budgeting?", min_value=1, max_value=5, value=3)
-            on_time_bill_payment = st.slider("How often do you pay bills on time?", min_value=1, max_value=5, value=3)
-            expense_tracking = st.checkbox("I actively track my expenses")
             impulse_buying_frequency = st.slider("How often do you buy things impulsively?", min_value=1, max_value=5, value=3)
-            emergency_fund_months = st.slider("Emergency fund coverage (months)", min_value=0.0, max_value=12.0, value=2.0, step=0.5)
-            financial_goal_clarity = st.slider("How clear are your financial goals?", min_value=1, max_value=5, value=3)
 
             left, right = st.columns(2)
             with left:
@@ -343,16 +383,7 @@ with st.container():
                 # UI-only placeholder output. Replace with real model calls later.
                 base_score = 50
                 base_score += (budgeting_habit - 3) * 6
-                base_score += (on_time_bill_payment - 3) * 5
                 base_score -= (impulse_buying_frequency - 3) * 5
-                base_score += 4 if expense_tracking else -2
-                base_score += min(8, int(emergency_fund_months))
-                base_score += (financial_goal_clarity - 3) * 4
-
-                if debt_amount > monthly_income:
-                    base_score -= 8
-                if savings_balance > monthly_income:
-                    base_score += 6
 
                 score = max(0, min(100, base_score))
                 if score >= 75:
@@ -367,14 +398,8 @@ with st.container():
 
                 st.session_state.answers = {
                     "monthly_income": monthly_income,
-                    "savings_balance": savings_balance,
-                    "debt_amount": debt_amount,
                     "budgeting_habit": budgeting_habit,
-                    "on_time_bill_payment": on_time_bill_payment,
-                    "expense_tracking": expense_tracking,
                     "impulse_buying_frequency": impulse_buying_frequency,
-                    "emergency_fund_months": emergency_fund_months,
-                    "financial_goal_clarity": financial_goal_clarity,
                 }
 
                 st.session_state.result = {

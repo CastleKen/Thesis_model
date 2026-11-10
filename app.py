@@ -193,6 +193,12 @@ div.stButton > button[data-testid="stBaseButton-secondary"]:focus-visible {
     padding: 0.7rem;
 }
 
+.apriori-card {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(420px, 100%);
+}
+
 .kpi-label {
     font-size: 0.82rem;
     color: var(--muted);
@@ -220,6 +226,10 @@ div.stButton > button[data-testid="stBaseButton-secondary"]:focus-visible {
 
     .kpi-row {
         grid-template-columns: 1fr;
+    }
+
+    .apriori-card {
+        width: 100%;
     }
 }
 </style>
@@ -415,25 +425,31 @@ with st.container():
     elif st.session_state.screen == "result":
         profile = st.session_state.profile
         result = st.session_state.result
+        literacy_level = "High" if result["score"] >= 75 else "Low"
 
         st.header("Assessment Result")
+        st.subheader(f"Digital Financial Literacy: {literacy_level}")
 
         st.markdown(
             f"""
 <div class="kpi-row">
-  <div class="kpi-card"><div class="kpi-label">Digital Financial Literacy</div><div class="kpi-value">{result['score']}/100</div></div>
-  <div class="kpi-card"><div class="kpi-label">Literacy Band</div><div class="kpi-value">{result['band']}</div></div>
-  <div class="kpi-card"><div class="kpi-label">K-Means Segment (UI Placeholder)</div><div class="kpi-value">{result['segment']}</div></div>
-  <div class="kpi-card"><div class="kpi-label">Logistic Probability (UI Placeholder)</div><div class="kpi-value">{result['logistic_prob']}%</div></div>
+  <div class="kpi-card"><div class="kpi-label">Digital Financial Literacy Score</div><div class="kpi-value">{result['score']}/100</div></div>
+  <div class="kpi-card"><div class="kpi-label">Financial Behavior Cluster</div><div class="kpi-value">{result['segment']}</div></div>
+    <div class="kpi-card apriori-card"><div class="kpi-label">Apriori Analysis</div><div class="kpi-value">{result['rules_triggered']}</div></div>
 </div>
 """,
             unsafe_allow_html=True,
         )
 
-        st.write("### Notes")
-        st.write(f"- Association Rules (Apriori/ARL): {result['rules_triggered']}")
-        st.write("- Current output is UI-only and uses placeholder logic for demo flow.")
-        st.write("- You can connect your trained models to this screen later without changing the user flow.")
+        st.write("### Explanation:")
+        st.write(
+            "The digital financial literacy level is determined from your current score and financial behavior inputs. "
+            "A higher score indicates stronger budgeting and saving habits, while a lower score indicates areas that need support."
+        )
+        st.write(
+            "The Financial Behavior Cluster and Apriori Analysis summarize your spending and planning patterns, "
+            "which are used to identify practical next steps in the recommendations page."
+        )
 
         col1, col2 = st.columns(2)
         with col1:

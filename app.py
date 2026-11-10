@@ -179,6 +179,23 @@ div.stButton > button[data-testid="stBaseButton-secondary"]:focus-visible {
     color: var(--ink);
 }
 
+/* Grayish style for modal popups */
+[data-testid="stDialog"] [role="dialog"] {
+    background: #FEF3E2 !important;
+    border: 1px solid #c9cbd1 !important;
+    color: #2f3138 !important;
+}
+
+[data-testid="stDialog"] [role="dialog"] h1,
+[data-testid="stDialog"] [role="dialog"] h2,
+[data-testid="stDialog"] [role="dialog"] h3,
+[data-testid="stDialog"] [role="dialog"] p,
+[data-testid="stDialog"] [role="dialog"] li,
+[data-testid="stDialog"] [role="dialog"] span,
+[data-testid="stDialog"] [role="dialog"] div {
+    color: #2f3138 !important;
+}
+
 .kpi-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -336,8 +353,8 @@ with st.container():
     if st.session_state.screen == "welcome":
         st.title("Digital Financial Literacy Assessment")
         st.write(
-            "A simple kiosk interface for student financial behavior assessment. "
-            "Use this as your front-end shell before connecting your model pipeline."
+            "A simple kiosk interface for assessing student's digital financial literacy. "
+            "Integrated with a Machine Learning Model that uses K-Means Clustering, Logistic Regression, and Apriori Assosciation Rule Learning."
         )
 
         if st.button("Start Assessment", use_container_width=True, type="primary"):

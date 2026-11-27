@@ -227,3 +227,5 @@ __marimo__/
 
 # Pickle
 *.pkl
+
+data/raw/
